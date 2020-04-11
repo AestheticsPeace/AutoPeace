@@ -6,22 +6,24 @@ module.exports = {
     /**
      * @param {Message} message
      */
-	execute(message, args) {
-		var member = message.mentions.members.first() // so how about the roles of a member
+	execute(msg, args) {
+		var member = msg.mentions.members.first() // so how about the roles of a member
 		// you would get it by member.roles, but of course, it'd obviously be uh, member.roles.cache
 		// if you want to filter the @everyone / default role of it, member.roles.cache.filter(role => role.name !== '@everyone')
-		if (!member) member = message.member // msg.member = guild member of the user who sent the message
+		if (!member) member = msg.member // msg.member = guild member of the user who sent the message
 		let joinPos = 0
 		let memFound = false
-		message.guild.members.cache.sort((v1,v2) => v1.joinedTimestamp > v2.joinedTimestamp).map(mem => !memFound && (function(){joinPos++;if(mem.id===member.id)memFound=true;})())
-		const roles = String(member.roles.cache.filter(role => role.name === '@everyone'))
-		message.channel.send(new MessageEmbed()
-            .setColor('#0099ff')
-            .setTitle('Member Information') // 
+		msg.guild.members.cache.sort((v1,v2) => v1.joinedTimestamp > v2.joinedTimestamp).map(mem => !memFound && (function(){joinPos++;if(mem.id===member.id)memFound=true;})())
+		const roles = member.roles.cache.filter(role => role.id !== msg.guild.id).array();
+		////
+		msg.channel.send(new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Member Information')
+			.setAuthor(`${member.user.tag}`, member.user.displayAvatarURL({ size: 2048, dynamic: true }), null)
 			.addField('User Created At', member.user.createdAt)
-			.addField('User Joined At', member.user.joinedAt) // 
-			 .addField('Roles', roles.length > 2048 ? roles.length : String(roles)) // member.roles.cache.filter(role => role.name !== '@everyone')
-            .setFooter(`Executed by ${message.member.user.tag}`) // is it done? im still lacking brainpower
+			.addField('User Joined At', member.joinedAt) // 
+			 .addField('Roles', roles.join(', ').length > 2048 ? roles.length : String(roles.join(', '))) // member.roles.cache.filter(role => role.name !== '@everyone')
+            .setFooter(`Executed by ${msg.member.user.tag}`) // is it done? im still lacking brainpower
             .setTimestamp() // 
 		) // mentioned users are like, a normal user without any guildmember object sure
 	} // <GuildMember>.user === msg.author, so how would u do mentioned users -- Doing now
