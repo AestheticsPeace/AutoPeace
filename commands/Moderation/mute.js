@@ -43,9 +43,12 @@ module.exports = {
                     if ((returned && returned <= 0) || typeof(returned) === 'undefined') {
                         clearInterval(interv)
                         try {
-                            member.roles.remove(msg.guild.roles.cache.find(r => r.name === 'Muted')).then(() => {
-                                msg.channel.send(new MessageEmbed().setColor('#0099ff').setDescription(`**${member.user.tag} was auto unmuted**`))
-                            })
+                            let _r = member.roles.cache.find(r => r.name === 'Muted')
+                            if (_r) {
+                                member.roles.remove(_r).then(() => {
+                                    msg.channel.send(new MessageEmbed().setColor('#0099ff').setDescription(`**${member.user.tag} was auto unmuted**`))
+                                })
+                            }
                         } catch {
 
                         }
